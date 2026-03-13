@@ -1,149 +1,178 @@
-# API de Filmes
+﻿# 🎬 MovieAPI
 
-[![Python](https://img.shields.io/badge/Python-3.14+-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.135.1+-green.svg)](https://fastapi.tiangolo.com/)
-[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.48+-red.svg)](https://www.sqlalchemy.org/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange.svg)](https://www.mysql.com/)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.135.1-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D71F00?logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-8%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-Uma API RESTful robusta e escalável para gerenciar um banco de dados de filmes, construída com FastAPI e SQLAlchemy. Este projeto demonstra as melhores práticas no desenvolvimento de APIs, incluindo separação adequada de responsabilidades, validação de dados e integração com banco de dados.
+API REST para **cadastrar, listar, atualizar e remover filmes** usando **FastAPI + SQLAlchemy + MySQL**.
 
-## 🚀 Funcionalidades
+Se você nunca viu FastAPI, sem medo: este projeto foi feito para ser **fácil de rodar** e **fácil de entender**. 🙂
 
-- **Operações CRUD**: Criar, Ler, Atualizar e Deletar filmes
-- **Validação de Dados**: Esquemas Pydantic para validação de requisições/respostas
-- **Integração com Banco de Dados**: ORM SQLAlchemy com MySQL
-- **Tratamento de Erros**: Tratamento abrangente de exceções HTTP
-- **Documentação da API**: Documentação Swagger UI gerada automaticamente
-- **Arquitetura Modular**: Separação limpa entre controladores, serviços, modelos e esquemas
+## ✨ O que tem aqui
 
-## 🛠 Tecnologias
+- 🚀 FastAPI com documentação automática: `GET /docs` (Swagger) e `GET /redoc`
+- 🧱 Arquitetura em camadas (controller/service/model/schema)
+- ✅ Validação com Pydantic v2
+- 🗄️ SQLAlchemy ORM com MySQL via `pymysql`
 
-- **Backend**: Python 3.8+
-- **Framework**: FastAPI
-- **ORM**: SQLAlchemy
-- **Banco de Dados**: MySQL
-- **Validação**: Pydantic
-- **Driver**: PyMySQL
+## 🧭 Como o código está organizado
 
-## 📁 Estrutura do Projeto
+Fluxo:
 
+`Request -> Controller (rotas) -> Service (regras/CRUD) -> Model (ORM) -> Schema (resposta)`
+
+Pastas principais:
+
+- 🧷 `app/main.py`: cria a aplicação FastAPI e registra as rotas
+- 🧭 `app/controllers/movie_controller.py`: endpoints `/movies/...` e erros HTTP
+- 🧰 `app/services/movie_service.py`: lógica de CRUD e acesso ao banco
+- 🧱 `app/models/movie_model.py`: modelo ORM `Movie`
+- 🧾 `app/schemas/movie_schema.py`: schemas Pydantic (Create/Update/Response)
+- 🔌 `app/database/connection.py`: conexão MySQL (engine + `SessionLocal`)
+
+## 🗃️ Banco de dados
+
+Tabela `movies`:
+
+- `id` (int, PK, autoincrement)
+- `title` (varchar(50))
+- `year` (int)
+- `genre` (varchar(20))
+
+SQL mínimo para criar:
+
+```sql
+CREATE DATABASE IF NOT EXISTS moviesapi;
+USE moviesapi;
+
+CREATE TABLE IF NOT EXISTS movies (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(50) NOT NULL,
+  year INT NOT NULL,
+  genre VARCHAR(20) NOT NULL
+);
 ```
-movieAPI/
-├── app/
-│   ├── main.py                 # Ponto de entrada da aplicação FastAPI
-│   ├── controllers/
-│   │   └── movie_controller.py # Endpoints da API para operações com filmes
-│   ├── services/
-│   │   └── movie_service.py    # Camada de lógica de negócio
-│   ├── models/
-│   │   └── movie_model.py      # Modelos de banco de dados SQLAlchemy
-│   ├── schemas/
-│   │   └── movie_schema.py     # Esquemas Pydantic para requisições/respostas
-│   ├── database/
-│   │   └── connection.py       # Configuração do banco de dados e gerenciamento de sessão
-│   └── utils/                  # Funções utilitárias (se houver)
-├── .venv/                      # Ambiente virtual
-├── README.md                   # Documentação do projeto
-└── requirements.txt            # Dependências Python
+
+🔧 Conexão do banco (ajuste aqui se necessário): `app/database/connection.py`
+
+- `DB_USER` (padrão: `root`)
+- `DB_PASSWORD` (padrão: vazio)
+- `DB_HOST` (padrão: `localhost`)
+- `DB_NAME` (padrão: `moviesapi`)
+
+## 🔗 Endpoints
+
+Base local: `http://127.0.0.1:8000`
+
+| Método | Rota | O que faz |
+|---|---|---|
+| GET | `/` | Lista todos os filmes |
+| POST | `/movies/` | Cria um filme |
+| GET | `/movies/{movie_id}` | Busca filme por ID |
+| PUT | `/movies/{movie_id}` | Atualiza filme por ID (parcial) |
+| DELETE | `/movies/{movie_id}` | Remove filme por ID |
+
+## 🧾 Schemas (exemplos)
+
+`MovieCreate`
+
+```json
+{ "title": "The Matrix", "year": 1999, "genre": "Sci-Fi" }
 ```
 
-## 🔧 Instalação
+`MovieUpdate` (tudo opcional)
 
-### Pré-requisitos
+```json
+{ "genre": "Action" }
+```
 
-- Python 3.8 ou superior
-- MySQL 8.0 ou superior
-- Git
+`MovieResponse`
 
-### Configuração
+```json
+{ "id": 1, "title": "The Matrix", "year": 1999, "genre": "Sci-Fi" }
+```
 
-1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/yourusername/movieAPI.git
-   cd movieAPI
-   ```
+## 🚀 Rodando localmente (Windows / PowerShell)
 
-2. **Crie um ambiente virtual**
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # No Windows: .venv\Scripts\activate
-   ```
+### 1) ✅ Dependências
 
-3. **Instale as dependências**
-   ```bash
-   pip install -r requirements.txt
-   ```
+- MySQL em execução (local ou remoto)
+- Python (no Windows, o comando `py` costuma existir)
 
-4. **Configure o banco de dados**
-   - Crie um banco de dados MySQL chamado `moviesapi`
-   - Atualize as credenciais do banco em `app/database/connection.py` se necessário
-   - A aplicação criará automaticamente as tabelas necessárias na primeira execução
+### 2) 📦 Instalar pacotes
 
-5. **Execute a aplicação**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
 
-A API estará disponível em `http://localhost:8000`
+### 3) ▶️ Subir a API
 
-## 📖 Uso
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-### Endpoints da API
+Abra no navegador:
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/` | Endpoint raiz com status da API |
-| POST | `/movies/` | Criar um novo filme |
-| GET | `/movies/{movie_id}` | Obter um filme por ID |
-| PUT | `/movies/{movie_id}` | Atualizar um filme por ID |
-| DELETE | `/movies/{movie_id}` | Deletar um filme por ID |
+- 📚 Swagger UI: `http://127.0.0.1:8000/docs`
+- 📘 ReDoc: `http://127.0.0.1:8000/redoc`
 
-### Exemplos de Requisições
+## 🧪 Testando rapidinho (cURL)
 
-**Criar um Filme**
+Criar um filme:
+
 ```bash
-curl -X POST "http://localhost:8000/movies/" \
-     -H "Content-Type: application/json" \
-     -d '{"title": "Inception", "year": 2010, "genre": "Sci-Fi"}'
+curl -X POST "http://127.0.0.1:8000/movies/" \
+  -H "Content-Type: application/json" \
+  -d "{\"title\":\"The Matrix\",\"year\":1999,\"genre\":\"Sci-Fi\"}"
 ```
 
-**Obter um Filme**
-```bash
-curl -X GET "http://localhost:8000/movies/1"
-```
-
-### Documentação da API
-
-Visite `http://localhost:8000/docs` para a documentação interativa do Swagger UI.
-
-## 🧪 Testes
+Listar todos:
 
 ```bash
-# Execute com pytest (se testes forem adicionados)
-pytest
+curl "http://127.0.0.1:8000/"
 ```
 
-## 🤝 Contribuição
+Buscar por ID:
 
-Contribuições são bem-vindas! Siga estes passos:
+```bash
+curl "http://127.0.0.1:8000/movies/1"
+```
 
-1. Faça um fork do repositório
-2. Crie uma branch de funcionalidade (`git checkout -b feature/FuncionalidadeIncrivel`)
-3. Faça commit das suas mudanças (`git commit -m 'Adiciona alguma FuncionalidadeIncrivel'`)
-4. Faça push para a branch (`git push origin feature/FuncionalidadeIncrivel`)
-5. Abra um Pull Request
+Atualizar (parcial):
 
-## 📝 Licença
+```bash
+curl -X PUT "http://127.0.0.1:8000/movies/1" \
+  -H "Content-Type: application/json" \
+  -d "{\"genre\":\"Action\"}"
+```
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Remover:
 
-## 👨‍💻 Autor
+```bash
+curl -X DELETE "http://127.0.0.1:8000/movies/1"
+```
 
-**ReynanZ**  
-- GitHub: [@Reynanz](https://github.com/Reynanz)
-- LinkedIn: [Reynan Santana](https://linkedin.com/in/reynan-santana)
+## 🛠️ Notas (para quem está curioso)
 
+- 🧾 `app/database/connection.py` usa `echo=True`: o SQL aparece no console (ótimo para debug)
+- 🧼 O service abre/fecha sessão por operação: `create/get/update/delete` ficam bem diretos
 
----
+## 🆘 Dúvidas comuns
 
-⭐ Se este projeto foi útil para você, por favor dê uma estrela!
+**1) Está dando erro de conexão com o MySQL**
+
+- Confira `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` em `app/database/connection.py`
+- Garanta que o banco `moviesapi` e a tabela `movies` existem (SQL acima)
+
+**2) Onde vejo todos os endpoints bonitinhos?**
+
+- `http://127.0.0.1:8000/docs`
+
+## 🧭 Próximas melhorias (se quiser deixar “nível produção”)
+
+- 🔐 Ler credenciais de `.env` (ao invés de hardcode)
+- 🧪 Testes com `pytest`
+- 🐳 Docker Compose (API + MySQL)
+- 🔎 Paginação e filtros (ano/gênero/título)
