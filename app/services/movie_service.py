@@ -2,6 +2,15 @@ from app.models.movie_model import Movie
 from app.database.connection import SessionLocal
 
 
+#show all movies
+def show_all_movies():
+    db = SessionLocal()
+    try:
+        films = db.query(Movie).all()
+        return films
+    finally:
+        db.close()
+
 # Create a new movie
 def create_movie(title: str, year: int, genre: str):
     db = SessionLocal()  # Start a session in the database
